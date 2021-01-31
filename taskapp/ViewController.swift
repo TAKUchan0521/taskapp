@@ -62,6 +62,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     // Delete ボタンが押された時に呼ばれるメソッド
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        // ---ここから---
         if editingStyle == .delete {
             
             let task = self.taskArray[indexPath.row]
@@ -69,6 +70,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             let center = UNUserNotificationCenter.current()
             center.removePendingNotificationRequests(withIdentifiers: [String(task.id)])
             
+            //  データベースを削除する
             try! realm.write {
                 self.realm.delete(task)
                 tableView.deleteRows(at: [indexPath], with: .fade)
