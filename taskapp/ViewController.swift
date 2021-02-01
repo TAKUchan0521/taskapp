@@ -9,8 +9,9 @@ import UIKit
 import RealmSwift
 import UserNotifications
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var search: UISearchBar!
     
     // Realmインスタンスを取得する
     let realm = try! Realm()
@@ -25,6 +26,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // Do any additional setup after loading the view.
         tableView.delegate = self
         tableView.dataSource = self
+        search.delegate = self
+        search.showsCancelButton = true
+        search.enablesReturnKeyAutomatically = false
     }
     
     // データの数（＝セルの数）を返すメソッド
@@ -48,6 +52,21 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         cell.detailTextLabel?.text = dateString
         
         return cell
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        search.endEditing(true)
+        guard let searchText = search.text else { return }
+        
+        let result = realm.objects(Task.self).filter("category BEGINSWITH '\(searchText)'")
+        let count = result.count
+        
+        if (count == 0) {
+            taskArray = realm.objects(Task.self)
+        } else {
+            taskArray = result
+        }
+        tableView.reloadData()
     }
     
     // 各セルを選択した時に実行されるメソッド
@@ -110,8 +129,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         super.viewWillAppear(animated)
         tableView.reloadData()
     }
-
-
 
 }
 
