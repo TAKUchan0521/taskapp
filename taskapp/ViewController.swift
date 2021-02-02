@@ -27,7 +27,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         tableView.delegate = self
         tableView.dataSource = self
         search.delegate = self
-        search.showsCancelButton = true
         search.enablesReturnKeyAutomatically = false
     }
     
@@ -54,14 +53,24 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         return cell
     }
     
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        search.autocapitalizationType = .none  // 検索時、先頭を小文字で始める
+        return true
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        search.text = ""
+        taskArray = realm.objects(Task.self)
+        tableView.reloadData()
+    }
+    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         search.endEditing(true)
         guard let searchText = search.text else { return }
         
         let result = realm.objects(Task.self).filter("category BEGINSWITH '\(searchText)'")
-        let count = result.count
         
-        if (count == 0) {
+        if search.text == "" {
             taskArray = realm.objects(Task.self)
         } else {
             taskArray = result
